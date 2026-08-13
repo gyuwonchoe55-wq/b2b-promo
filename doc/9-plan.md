@@ -40,11 +40,11 @@ flowchart LR
 
 ## 0-1. 일정 배치 (PRD 9장)
 
-| Day | Task |
-| --- | --- |
+| Day   | Task                                                                   |
+| ----- | ---------------------------------------------------------------------- |
 | Day 1 | SETUP-1, SETUP-2, DB-1(완료), DB-2, DB-3, BE-1, BE-2, BE-3, FE-1, FE-2 |
-| Day 2 | BE-4, BE-5, FE-3, FE-4, FE-5 |
-| Day 3 | BE-6, BE-7, BE-8, FE-6, FE-7, FE-8 |
+| Day 2 | BE-4, BE-5, FE-3, FE-4, FE-5                                           |
+| Day 3 | BE-6, BE-7, BE-8, FE-6, FE-7, FE-8                                     |
 
 ---
 
@@ -55,9 +55,9 @@ flowchart LR
 - **선행 task**: 없음
 - **작업**: `backend/`에 npm 프로젝트를 만들고 런타임 의존성만 설치한다. 설치 대상은 `express`, `pg`, `bcrypt`, `jsonwebtoken`, `cors`, `dotenv`로 한정한다(그 외 라이브러리 추가 금지 — 원칙 5장).
 - **완료 조건**
-  - [ ] `backend/package.json`이 생성되고 위 6개 의존성만 존재한다
-  - [ ] `npm start`로 서버 실행이 가능한 스크립트가 정의되어 있다
-  - [ ] `.gitignore`에 `node_modules`, `.env`가 포함되어 있다
+  - [x] `backend/package.json`이 생성되고 위 6개 의존성만 존재한다
+  - [x] `npm start`로 서버 실행이 가능한 스크립트가 정의되어 있다
+  - [x] `.gitignore`에 `node_modules`, `.env`가 포함되어 있다
 
 ### SETUP-2. 프론트엔드 프로젝트 초기화
 
@@ -87,18 +87,18 @@ flowchart LR
 - **선행 task**: SETUP-1
 - **작업**: `backend/src/db/pool.js`에 `pg` Pool을 환경변수 기반으로 구성하고, `backend/.env.example`에 필요한 키(DB 접속 정보, `JWT_SECRET`, `PORT`, 프론트 오리진)를 정의한다. 실제 `.env`는 커밋하지 않는다.
 - **완료 조건**
-  - [ ] `pool.js`가 환경변수로 접속 정보를 읽고 Pool 인스턴스를 export한다
-  - [ ] `.env.example`에 모든 필요 키가 값 없이 나열되어 있다
-  - [ ] `.env`가 git에 추적되지 않는다
+  - [x] `pool.js`가 환경변수로 접속 정보를 읽고 Pool 인스턴스를 export한다
+  - [x] `.env.example`에 모든 필요 키가 값 없이 나열되어 있다
+  - [x] `.env`가 git에 추적되지 않는다
 
 ### DB-3. 로컬 DB에 스키마 적용 및 접속 검증
 
 - **선행 task**: DB-1, DB-2
 - **작업**: 로컬 PostgreSQL 17에 데이터베이스를 만들고 `schema.sql`을 실행한다. Pool을 통해 실제 쿼리가 성공하는지 확인한다.
 - **완료 조건**
-  - [ ] `schema.sql`이 오류 없이 실행되어 3개 테이블이 생성된다
-  - [ ] `SELECT 1` 수준의 쿼리가 `pool.js`를 통해 성공한다
-  - [ ] 제약 위반 케이스(중복 email 삽입, 진행일 < 신청 종료일 삽입)가 DB에서 거부되는 것을 확인했다
+  - [x] `schema.sql`이 오류 없이 실행되어 3개 테이블이 생성된다
+  - [x] `SELECT 1` 수준의 쿼리가 `pool.js`를 통해 성공한다
+  - [x] 제약 위반 케이스(중복 email 삽입, 진행일 < 신청 종료일 삽입)가 DB에서 거부되는 것을 확인했다
 
 ---
 
