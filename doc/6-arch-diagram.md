@@ -73,3 +73,34 @@ sequenceDiagram
     백엔드->>백엔드: refresh token 검증(무상태, 서명만 확인)
     백엔드-->>클라이언트: 새 access token 발급
 ```
+
+## 4. 프론트엔드 컴포넌트 구조도
+
+`doc/5-project-principle.md`의 디렉토리 구조 기준으로, 페이지가 공통 컴포넌트를 조합하고 api 훅(TanStack Query)과 store(Zustand)를 사용하는 구조다.
+
+```mermaid
+flowchart TB
+    App["App.jsx<br/>(라우팅)"] --> Header["Header<br/>(공통 컴포넌트)"]
+
+    App --> LoginPage
+    App --> SignupPage
+    App --> PromotionListPage
+    App --> PromotionDetailPage
+    App --> PromotionFormPage
+    App --> ApplicationStatusPage
+
+    PromotionListPage --> PromotionCard["PromotionCard<br/>(공통 컴포넌트)"]
+
+    LoginPage --> AuthApi["authApi<br/>(TanStack Query)"]
+    SignupPage --> AuthApi
+    AuthApi --> AuthStore["authStore<br/>(Zustand)"]
+
+    PromotionListPage --> PromotionApi["promotionApi<br/>(TanStack Query)"]
+    PromotionDetailPage --> PromotionApi
+    PromotionFormPage --> PromotionApi
+
+    PromotionDetailPage --> ApplicationApi["applicationApi<br/>(TanStack Query)"]
+    ApplicationStatusPage --> ApplicationApi
+
+    AuthStore -.로그인 사용자 정보.-> Header
+```
