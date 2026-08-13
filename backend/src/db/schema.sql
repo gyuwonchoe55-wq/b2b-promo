@@ -18,8 +18,11 @@ CREATE TABLE promotions (
     apply_end_at   DATE NOT NULL,
     event_date     DATE NOT NULL,
     capacity       INT NOT NULL,
+    applied_count  INT NOT NULL DEFAULT 0,
     CONSTRAINT chk_promotion_dates
-        CHECK (apply_end_at >= apply_start_at AND event_date >= apply_end_at)
+        CHECK (apply_end_at >= apply_start_at AND event_date >= apply_end_at),
+    CONSTRAINT chk_promotion_applied_count
+        CHECK (applied_count >= 0 AND applied_count <= capacity)
 );
 
 CREATE TABLE applications (

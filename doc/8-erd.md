@@ -27,6 +27,7 @@ erDiagram
         date apply_end_at
         date event_date
         int capacity
+        int applied_count "현재 신청 인원(카운터)"
     }
 
     APPLICATION {
@@ -52,6 +53,7 @@ erDiagram
 
 - `capacity`(모집 인원)와 신청 시작/종료일, 진행일을 가진다.
 - 진행일(`event_date`)은 신청 종료일(`apply_end_at`) 이상이어야 한다는 제약은 애플리케이션/DB 체크로 처리한다(도메인 정의서 7장).
+- `applied_count`는 도메인 정의서에는 없던 컬럼이지만, PRD 8장의 "`UPDATE ... WHERE 신청인원 < 모집인원` 형태의 단일 쿼리로 정원 초과를 원자적으로 검증한다"는 요구사항을 그대로 구현하기 위해 추가했다. 신청 시 `UPDATE promotions SET applied_count = applied_count + 1 WHERE id = ? AND applied_count < capacity`가 0행을 갱신하면 정원 마감으로 판단해 신청을 거부하고, 성공하면 같은 트랜잭션에서 `applications`에 INSERT한다. 신청 취소 시에는 같은 트랜잭션에서 `applied_count`를 1 감소시킨다. `applied_count`가 `applications` 실제 행 수와 항상 일치하도록 두 테이블은 반드시 같은 트랜잭션 안에서 함께 갱신한다.
 
 ### APPLICATION
 
