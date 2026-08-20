@@ -64,9 +64,9 @@ flowchart LR
 - **선행 task**: 없음 (SETUP-1과 병행 가능)
 - **작업**: Vite로 `frontend/` React 19 프로젝트를 생성하고 `zustand`, `@tanstack/react-query`, `react-router-dom`을 설치한다. `doc/5-project-principle.md` 6장의 디렉토리(`api/`, `store/`, `pages/`, `components/`)를 빈 폴더로 만든다.
 - **완료 조건**
-  - [ ] `npm run dev`로 개발 서버가 기동되고 기본 화면이 렌더링된다
-  - [ ] React 19 + zustand + TanStack Query + react-router-dom이 설치되어 있다
-  - [ ] `src/api/`, `src/store/`, `src/pages/`, `src/components/` 폴더가 존재한다
+  - [x] `npm run dev`로 개발 서버가 기동되고 기본 화면이 렌더링된다
+  - [x] React 19 + zustand + TanStack Query + react-router-dom이 설치되어 있다
+  - [x] `src/api/`, `src/store/`, `src/pages/`, `src/components/` 폴더가 존재한다
 
 ---
 
@@ -118,74 +118,74 @@ flowchart LR
 - **선행 task**: BE-1
 - **작업**: `middleware/auth.js`에서 `Authorization` 헤더의 access token을 검증하고 `req.user`(id, role)를 주입한다. 검증 실패 시 401을 반환한다.
 - **완료 조건**
-  - [ ] 유효한 access token이면 `req.user`에 id와 role이 주입된다
-  - [ ] 토큰 없음/위조/만료 시 401이 반환된다
-  - [ ] 역할 검사(MANAGER 전용 라우트 차단)가 이 미들웨어 또는 라우트 레벨에서 가능하다
+  - [x] 유효한 access token이면 `req.user`에 id와 role이 주입된다
+  - [x] 토큰 없음/위조/만료 시 401이 반환된다
+  - [x] 역할 검사(MANAGER 전용 라우트 차단)가 이 미들웨어 또는 라우트 레벨에서 가능하다
 
 ### BE-3. 인증 API (회원가입 / 로그인 / 토큰 재발급) — P0
 
 - **선행 task**: BE-2
 - **작업**: `user/userQueries.js`(SQL)와 `user/userRoutes.js`(라우터 겸 서비스)를 작성한다. 회원가입 시 비밀번호를 bcrypt로 해시 저장하고 역할을 받는다. 로그인 시 access token(짧은 만료)과 refresh token(긴 만료)을 함께 발급하며, refresh token은 무상태로 서명만 검증해 access token을 재발급한다(별도 테이블 없음 — PRD 7장).
 - **완료 조건**
-  - [ ] 이름/이메일/비밀번호/역할로 회원가입이 성공하고 비밀번호가 평문으로 저장되지 않는다
-  - [ ] 중복 이메일 가입 시도가 409(또는 정의된 실패 응답)로 거부된다
-  - [ ] 올바른 이메일/비밀번호로 로그인 시 access token과 refresh token이 함께 반환된다
-  - [ ] 잘못된 자격증명 로그인이 401로 거부된다
-  - [ ] refresh token으로 새 access token을 재발급받을 수 있다
+  - [x] 이름/이메일/비밀번호/역할로 회원가입이 성공하고 비밀번호가 평문으로 저장되지 않는다
+  - [x] 중복 이메일 가입 시도가 409(또는 정의된 실패 응답)로 거부된다
+  - [x] 올바른 이메일/비밀번호로 로그인 시 access token과 refresh token이 함께 반환된다
+  - [x] 잘못된 자격증명 로그인이 401로 거부된다
+  - [x] refresh token으로 새 access token을 재발급받을 수 있다
 
 ### BE-4. 프로모션 등록 및 목록/상세 조회 API — P0
 
 - **선행 task**: BE-3
 - **작업**: `promotion/promotionQueries.js`와 `promotion/promotionRoutes.js`를 작성한다. 등록은 MANAGER만 허용하고 `event_date >= apply_end_at`를 검증하며 `applied_count`는 0으로 시작한다. 목록/상세는 두 역할 공통이며 모집 인원과 **현재 신청 인원**(`applied_count` 컬럼 값)을 함께 반환한다. 응답 DTO 키는 camelCase로 변환한다(원칙 3장).
 - **완료 조건**
-  - [ ] MANAGER가 제목/내용/신청기간/진행일/모집인원으로 프로모션을 등록할 수 있다
-  - [ ] PARTICIPANT의 등록 요청이 403으로 거부된다
-  - [ ] 진행일이 신청 종료일보다 이전이면 400으로 거부된다
-  - [ ] 필수 항목 누락 시 400으로 거부된다
-  - [ ] 목록/상세 응답에 모집 인원과 현재 신청 인원이 포함되고 키가 camelCase다
+  - [x] MANAGER가 제목/내용/신청기간/진행일/모집인원으로 프로모션을 등록할 수 있다
+  - [x] PARTICIPANT의 등록 요청이 403으로 거부된다
+  - [x] 진행일이 신청 종료일보다 이전이면 400으로 거부된다
+  - [x] 필수 항목 누락 시 400으로 거부된다
+  - [x] 목록/상세 응답에 모집 인원과 현재 신청 인원이 포함되고 키가 camelCase다
 
 ### BE-5. 프로모션 수정/삭제 API — P1
 
 - **선행 task**: BE-4
 - **작업**: 등록자 본인만 수정/삭제 가능하도록 소유권을 검사한다. 신청자가 있는 경우 모집 인원을 현재 신청 인원 미만으로 축소할 수 없다. 삭제 시 신청 기록은 FK CASCADE로 함께 제거된다.
 - **완료 조건**
-  - [ ] 등록자 본인만 수정/삭제할 수 있고 타인 요청은 403으로 거부된다
-  - [ ] 현재 신청 인원보다 작은 모집 인원으로 수정 시 400으로 거부된다
-  - [ ] 프로모션 삭제 시 해당 프로모션의 신청 기록이 함께 삭제된다
-  - [ ] 수정 시에도 진행일 ≥ 신청 종료일 검증이 적용된다
+  - [x] 등록자 본인만 수정/삭제할 수 있고 타인 요청은 403으로 거부된다
+  - [x] 현재 신청 인원보다 작은 모집 인원으로 수정 시 400으로 거부된다
+  - [x] 프로모션 삭제 시 해당 프로모션의 신청 기록이 함께 삭제된다
+  - [x] 수정 시에도 진행일 ≥ 신청 종료일 검증이 적용된다
 
 ### BE-6. 참가 신청 및 취소 API — P0
 
 - **선행 task**: BE-4
 - **작업**: `application/applicationQueries.js`와 `application/applicationRoutes.js`를 작성한다. PARTICIPANT만 신청 가능하며 신청자는 `req.user`에서 가져온다(클라이언트 입력 신뢰 금지). 신청 기간 내 여부를 검증하고, 중복 신청은 `(promotion_id, user_id)` 유니크 제약으로 차단한다. 정원 초과는 **하나의 트랜잭션 안에서 `UPDATE promotions SET applied_count = applied_count + 1 WHERE id = ? AND applied_count < capacity`를 실행하고, 갱신된 행이 0건이면 정원 마감으로 거부, 1건이면 같은 트랜잭션에서 `applications`에 INSERT**해 PRD 8장이 지정한 방식 그대로 원자적으로 처리한다(`doc/8-erd.md` PROMOTION 설명 참고). 취소는 본인 신청만 가능하며, 같은 트랜잭션에서 `applications` 삭제와 `applied_count` 1 감소를 함께 수행한다.
 - **완료 조건**
-  - [ ] PARTICIPANT가 기간 내 프로모션에 신청하면 신청 기록이 생성되고 `applied_count`가 1 증가한다
-  - [ ] 동일 사용자가 같은 프로모션에 재신청하면 중복으로 거부된다
-  - [ ] 신청 기간이 아닌 프로모션 신청 요청이 서버에서 거부된다
-  - [ ] 정원이 찬 프로모션 신청이 거부되고, 동시 요청 시에도 `applied_count`가 `capacity`를 넘지 않는다
-  - [ ] 본인 신청만 취소되고 타인 신청 취소 요청은 403으로 거부된다
-  - [ ] 신청 취소 성공 시 `applied_count`가 1 감소하고 `applications` 실제 행 수와 일치한다
-  - [ ] 신청자 ID를 요청 본문으로 위조해도 무시되고 토큰의 사용자로 기록된다
+  - [x] PARTICIPANT가 기간 내 프로모션에 신청하면 신청 기록이 생성되고 `applied_count`가 1 증가한다
+  - [x] 동일 사용자가 같은 프로모션에 재신청하면 중복으로 거부된다
+  - [x] 신청 기간이 아닌 프로모션 신청 요청이 서버에서 거부된다
+  - [x] 정원이 찬 프로모션 신청이 거부되고, 동시 요청 시에도 `applied_count`가 `capacity`를 넘지 않는다
+  - [x] 본인 신청만 취소되고 타인 신청 취소 요청은 403으로 거부된다
+  - [x] 신청 취소 성공 시 `applied_count`가 1 감소하고 `applications` 실제 행 수와 일치한다
+  - [x] 신청자 ID를 요청 본문으로 위조해도 무시되고 토큰의 사용자로 기록된다
 
 ### BE-7. 신청 현황 및 신청자 목록 API — P1
 
 - **선행 task**: BE-6
 - **작업**: MANAGER가 **본인이 등록한** 프로모션의 현재 신청 인원과 신청자 목록(이름, 신청 일시)을 조회하는 엔드포인트를 작성한다.
 - **완료 조건**
-  - [ ] 본인 등록 프로모션의 신청 인원과 신청자 목록(이름, 신청 일시)이 반환된다
-  - [ ] 타인이 등록한 프로모션 조회 요청이 403으로 거부된다
-  - [ ] 신청자가 없으면 빈 배열이 반환된다(에러가 아님)
+  - [x] 본인 등록 프로모션의 신청 인원과 신청자 목록(이름, 신청 일시)이 반환된다
+  - [x] 타인이 등록한 프로모션 조회 요청이 403으로 거부된다
+  - [x] 신청자가 없으면 빈 배열이 반환된다(에러가 아님)
 
 ### BE-8. 핵심 비즈니스 로직 검증
 
 - **선행 task**: BE-5, BE-6
 - **작업**: `doc/5-project-principle.md` 4장이 지정한 4개 항목만 Node 내장 `node:test`로 검증한다. 별도 테스트 프레임워크·E2E·커버리지는 만들지 않는다.
 - **완료 조건**
-  - [ ] 중복 신청 방지 검증이 통과한다
-  - [ ] 정원 초과 검증이 동시 신청 시나리오(병렬 요청)에서 통과한다
-  - [ ] 진행일 ≥ 신청 종료일 검증이 통과한다
-  - [ ] 신청자 존재 시 정원 축소 제한 검증이 통과한다
-  - [ ] `node --test`로 전체 실행이 성공한다
+  - [x] 중복 신청 방지 검증이 통과한다 (`application/applicationRoutes.test.js` 409 케이스)
+  - [x] 정원 초과 검증이 동시 신청 시나리오(병렬 요청)에서 통과한다 (`application/applicationConcurrency.test.js`, 신규)
+  - [x] 진행일 ≥ 신청 종료일 검증이 통과한다 (`promotion/promotionRoutes.test.js`, `promotion/promotionUpdateDelete.test.js`)
+  - [x] 신청자 존재 시 정원 축소 제한 검증이 통과한다 (`promotion/promotionUpdateDelete.test.js`)
+  - [x] `node --test`로 전체 실행이 성공한다 (`npm test` → 52개 전체 통과)
 
 ---
 
@@ -196,10 +196,10 @@ flowchart LR
 - **선행 task**: SETUP-2
 - **작업**: `App.jsx`에 6개 페이지 라우트를 등록하고 QueryClientProvider를 설정한다. `store/authStore.js`(Zustand)에 로그인 사용자 정보와 토큰만 담는다. API 호출 함수에서 access token 첨부와 401 시 refresh 재시도를 처리한다. 별도 서비스/리포지토리 레이어는 만들지 않는다.
 - **완료 조건**
-  - [ ] 6개 라우트(로그인/회원가입/목록/상세/폼/신청현황)가 등록되어 이동된다
-  - [ ] 비로그인 상태로 인증 필요 화면 접근 시 로그인 화면으로 리다이렉트된다
-  - [ ] authStore에 로그인 사용자 정보와 토큰만 저장되고 서버 데이터는 담기지 않는다
-  - [ ] API 요청에 access token이 자동 첨부되고, 401 시 refresh로 1회 재시도된다
+  - [x] 6개 라우트(로그인/회원가입/목록/상세/폼/신청현황)가 등록되어 이동된다
+  - [x] 비로그인 상태로 인증 필요 화면 접근 시 로그인 화면으로 리다이렉트된다
+  - [x] authStore에 로그인 사용자 정보와 토큰만 저장되고 서버 데이터는 담기지 않는다
+  - [x] API 요청에 access token이 자동 첨부되고, 401 시 refresh로 1회 재시도된다
 
 ### FE-2. LoginPage / SignupPage — P0
 
