@@ -121,7 +121,7 @@ backend/
   src/
     db/
       pool.js              # pg Pool 연결 설정
-      schema.sql            # 테이블 생성 스크립트 (users/promotions/applications)
+                            # 테이블 생성 스크립트(DDL)는 `../../docs/8-schema.sql`에 둔다
     user/
       userRoutes.js         # 회원가입/로그인 라우터 + 컨트롤러 겸 서비스
       userQueries.js         # pg 쿼리 함수

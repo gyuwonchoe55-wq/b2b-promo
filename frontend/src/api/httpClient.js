@@ -53,4 +53,14 @@ async function request(path, options = {}, isRetry = false) {
   return res.json();
 }
 
+export function decodeAccessToken(accessToken) {
+  try {
+    const payload = accessToken.split('.')[1];
+    const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
 export default request;

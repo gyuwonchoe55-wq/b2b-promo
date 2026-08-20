@@ -33,3 +33,6 @@ Thumbs.db
 
 # misc
 *.local
+
+# playwright mcp test artifacts
+.playwright-mcp/

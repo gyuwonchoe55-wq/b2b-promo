@@ -10,7 +10,7 @@
       "url": "http://localhost:{port}/api",
       "description": "로컬 개발 서버 (프론트엔드와 별도 오리진, CORS로 접근. 포트는 .env의 PORT 값)",
       "variables": {
-        "port": { "default": "4000" }
+        "port": { "default": "3000" }
       }
     }
   ],
@@ -83,7 +83,7 @@
         "properties": {
           "name": { "type": "string", "example": "홍길동" },
           "email": { "type": "string", "format": "email", "example": "user@example.com" },
-          "password": { "type": "string", "format": "password", "minLength": 8, "example": "password123" },
+          "password": { "type": "string", "format": "password", "example": "password123" },
           "role": { "$ref": "#/components/schemas/Role" }
         },
         "required": ["name", "email", "password", "role"]
@@ -98,12 +98,12 @@
       },
       "LoginResponse": {
         "type": "object",
+        "description": "user 정보는 내려주지 않는다. 클라이언트는 accessToken(JWT)의 payload({id, role})를 디코드해 역할을 판단한다.",
         "properties": {
           "accessToken": { "type": "string" },
-          "refreshToken": { "type": "string" },
-          "user": { "$ref": "#/components/schemas/User" }
+          "refreshToken": { "type": "string" }
         },
-        "required": ["accessToken", "refreshToken", "user"]
+        "required": ["accessToken", "refreshToken"]
       },
       "RefreshRequest": {
         "type": "object",
