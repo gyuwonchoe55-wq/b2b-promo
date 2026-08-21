@@ -3,16 +3,15 @@
 - 대상: `https://b2bpro-121-be.vercel.app/api` (Vercel 배포)
 - 방식: `docs/4-user-scenario.md` 기준 시나리오를 API 레벨로 직접 호출 (`e2e/api-e2e.js`, Node 내장 fetch, 추가 의존성 없음)
 - 실행: `node e2e/api-e2e.js https://b2bpro-121-be.vercel.app`
-- 결과: 총 34건 중 PASS 31 / FAIL 3
+- 결과: 총 34건 중 PASS 34 / FAIL 0 (최초 실행은 31/3, 아래 결함 수정·재배포 후 재실행하여 전건 통과)
 
-## 발견된 결함
+## 발견 후 수정된 결함
 
 **`GET /api/promotions/{promotionId}/applications/me` 가 배포 백엔드에서 404**
 
-- 회원가입/로그인/신청/신청현황/취소/cascade 삭제 등 나머지 전 시나리오는 정상 동작.
-- 로컬 코드(`backend/src/application/applicationRoutes.js:76`)에는 해당 라우트가 있으나, `git status` 확인 결과 이 파일이 아직 커밋되지 않은 변경 상태(`M`)다. 배포된 커밋(HEAD)에는 `DELETE /me`만 있고 `GET /me`는 없다 — 즉 이전 리포트(`e2e/report.md`)의 BUG-2 수정이 로컬에만 존재하고 배포에는 반영되지 않았다.
-- 영향: 배포 프론트엔드가 이 API를 호출한다면(BUG-2 수정 내용대로) 신청 상태 조회가 항상 404로 실패한다.
-- 조치: `applicationQueries.js`, `applicationRoutes.js`, `applicationRoutes.test.js`, `docs/swagger.json` 변경분을 커밋 후 재배포 필요.
+- 최초 실행 시 회원가입/로그인/신청/신청현황/취소/cascade 삭제 등 나머지 시나리오는 모두 정상 동작했으나, 이 엔드포인트만 404.
+- 원인: 로컬 코드(`backend/src/application/applicationRoutes.js:76`)에는 해당 라우트(BUG-2 수정분)가 있었지만 커밋되지 않아 배포에 반영되지 않은 상태였음.
+- 조치: `applicationQueries.js`, `applicationRoutes.js`, `applicationRoutes.test.js`, `docs/swagger.json` 변경분을 커밋·push하여 재배포, 재실행으로 34/34 전건 통과 확인.
 
 ## 커버한 시나리오 (PASS)
 
