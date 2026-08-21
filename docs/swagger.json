@@ -143,6 +143,15 @@
           "capacity": { "type": "integer", "minimum": 1 }
         }
       },
+      "MyApplicationStatus": {
+        "type": "object",
+        "description": "로그인한 취식자 본인이 해당 프로모션에 신청했는지 여부.",
+        "properties": {
+          "applied": { "type": "boolean", "example": true },
+          "appliedAt": { "type": "string", "format": "date-time", "nullable": true, "example": "2026-08-14T09:00:00.000Z" }
+        },
+        "required": ["applied", "appliedAt"]
+      },
       "ApplicationStatusResponse": {
         "type": "object",
         "properties": {
@@ -488,6 +497,31 @@
       }
     },
     "/promotions/{promotionId}/applications/me": {
+      "get": {
+        "tags": ["Applications"],
+        "summary": "내 신청 여부 조회 (취식자 전용)",
+        "description": "로그인한 취식자 본인이 해당 프로모션에 신청했는지, 신청했다면 신청 일시를 조회한다.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/PromotionId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "조회 성공",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/MyApplicationStatus" } }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": {
+            "description": "MANAGER는 조회 불가",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
       "delete": {
         "tags": ["Applications"],
         "summary": "참가 신청 취소 (본인 신청만)",

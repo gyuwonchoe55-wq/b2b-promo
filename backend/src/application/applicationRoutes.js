@@ -1,5 +1,5 @@
 const express = require('express');
-const { apply, cancel, findApplicantsByPromotionId } = require('./applicationQueries');
+const { apply, cancel, findByPromotionAndUser, findApplicantsByPromotionId } = require('./applicationQueries');
 const { findById } = require('../promotion/promotionQueries');
 const { requireRole } = require('../middleware/auth');
 
@@ -68,6 +68,24 @@ router.get('/', requireRole('MANAGER'), async (req, res, next) => {
       appliedCount: promotion.appliedCount,
       applicants,
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/me', requireRole('PARTICIPANT'), async (req, res, next) => {
+  try {
+    const promotion = await findById(req.params.promotionId);
+
+    if (!promotion) {
+      const err = new Error('프로모션을 찾을 수 없습니다');
+      err.statusCode = 404;
+      return next(err);
+    }
+
+    const application = await findByPromotionAndUser({ promotionId: req.params.promotionId, userId: req.user.id });
+
+    res.json({ applied: Boolean(application), appliedAt: application ? application.appliedAt : null });
   } catch (err) {
     next(err);
   }

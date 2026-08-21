@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../store/authStore';
 import { getPromotion, deletePromotion } from '../api/promotionApi';
-import { applyToPromotion, cancelApplication } from '../api/applicationApi';
+import { applyToPromotion, cancelApplication, getMyApplication } from '../api/applicationApi';
 import Header from '../components/Header';
 
 const LABEL_STYLE = {
@@ -48,14 +47,19 @@ export default function PromotionDetailPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const user = useAuthStore((s) => s.user);
+  const isParticipant = user?.role === 'PARTICIPANT';
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['promotion', id],
     queryFn: () => getPromotion(id),
   });
 
-  // ponytail: 서버에 "내 신청 여부" 조회 API가 없어 세션 내 로컬 상태로만 추적한다.
-  // 새로고침하면 초기화되며, 백엔드에 조회 엔드포인트가 추가되면 쿼리로 대체한다.
-  const [hasApplied, setHasApplied] = useState(false);
+  const { data: myApplication } = useQuery({
+    queryKey: ['myApplication', id],
+    queryFn: () => getMyApplication(id),
+    enabled: isParticipant,
+  });
+
+  const hasApplied = Boolean(myApplication?.applied);
 
   const deleteMutation = useMutation({
     mutationFn: () => deletePromotion(id),
@@ -68,16 +72,16 @@ export default function PromotionDetailPage() {
   const applyMutation = useMutation({
     mutationFn: () => applyToPromotion(id),
     onSuccess: () => {
-      setHasApplied(true);
       queryClient.invalidateQueries({ queryKey: ['promotion', id] });
+      queryClient.invalidateQueries({ queryKey: ['myApplication', id] });
     },
   });
 
   const cancelMutation = useMutation({
     mutationFn: () => cancelApplication(id),
     onSuccess: () => {
-      setHasApplied(false);
       queryClient.invalidateQueries({ queryKey: ['promotion', id] });
+      queryClient.invalidateQueries({ queryKey: ['myApplication', id] });
     },
   });
 
@@ -88,7 +92,6 @@ export default function PromotionDetailPage() {
   }
 
   const isOwner = user?.role === 'MANAGER' && data?.managerId === user?.id;
-  const isParticipant = user?.role === 'PARTICIPANT';
 
   const today = new Date().toISOString().slice(0, 10);
   const isPastDeadline = Boolean(data) && today > data.applyEndAt;

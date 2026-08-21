@@ -138,6 +138,14 @@ async function applyToPromotion(promotionId, token, body) {
   return { res, json };
 }
 
+async function getMyApplication(promotionId, token) {
+  const res = await fetch(`${baseUrl}/api/promotions/${promotionId}/applications/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const json = await res.json().catch(() => null);
+  return { res, json };
+}
+
 async function cancelApplication(promotionId, token) {
   const res = await fetch(`${baseUrl}/api/promotions/${promotionId}/applications/me`, {
     method: 'DELETE',
@@ -225,6 +233,49 @@ describe('POST /api/promotions/:promotionId/applications', () => {
 
     assert.strictEqual(res.status, 201);
     assert.strictEqual(json.userId, participant1Id);
+  });
+});
+
+describe('GET /api/promotions/:promotionId/applications/me', () => {
+  test('신청한 적 있으면 applied: true와 appliedAt을 반환한다', async () => {
+    const { json: promo } = await createPromotion(managerToken, { title: uniqueTitle('my-status-applied') });
+    await applyToPromotion(promo.id, participant1Token);
+
+    const { res, json } = await getMyApplication(promo.id, participant1Token);
+
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(json.applied, true);
+    assert.ok(json.appliedAt);
+  });
+
+  test('신청한 적 없으면 applied: false를 반환한다', async () => {
+    const { json: promo } = await createPromotion(managerToken, { title: uniqueTitle('my-status-not-applied') });
+
+    const { res, json } = await getMyApplication(promo.id, participant1Token);
+
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(json.applied, false);
+    assert.strictEqual(json.appliedAt, null);
+  });
+
+  test('다른 사용자의 신청 여부에는 영향받지 않는다', async () => {
+    const { json: promo } = await createPromotion(managerToken, { title: uniqueTitle('my-status-other-user') });
+    await applyToPromotion(promo.id, participant1Token);
+
+    const { json: mine } = await getMyApplication(promo.id, participant2Token);
+
+    assert.strictEqual(mine.applied, false);
+  });
+
+  test('존재하지 않는 promotionId로 조회하면 404를 반환한다', async () => {
+    const { res } = await getMyApplication(999999999, participant1Token);
+    assert.strictEqual(res.status, 404);
+  });
+
+  test('MANAGER 토큰으로 조회하면 403을 반환한다', async () => {
+    const { json: promo } = await createPromotion(managerToken, { title: uniqueTitle('my-status-manager') });
+    const { res } = await getMyApplication(promo.id, managerToken);
+    assert.strictEqual(res.status, 403);
   });
 });
 

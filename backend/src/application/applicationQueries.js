@@ -76,6 +76,14 @@ async function cancel({ promotionId, userId }) {
   }
 }
 
+async function findByPromotionAndUser({ promotionId, userId }) {
+  const { rows } = await pool.query(
+    'SELECT * FROM applications WHERE promotion_id = $1 AND user_id = $2',
+    [promotionId, userId]
+  );
+  return rows[0] ? toDto(rows[0]) : null;
+}
+
 async function findApplicantsByPromotionId(promotionId) {
   const { rows } = await pool.query(
     `SELECT a.user_id, u.name, a.applied_at
@@ -87,4 +95,4 @@ async function findApplicantsByPromotionId(promotionId) {
   return rows.map((row) => ({ userId: row.user_id, name: row.name, appliedAt: row.applied_at }));
 }
 
-module.exports = { apply, cancel, findApplicantsByPromotionId };
+module.exports = { apply, cancel, findByPromotionAndUser, findApplicantsByPromotionId };
